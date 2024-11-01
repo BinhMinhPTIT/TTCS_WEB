@@ -15,23 +15,16 @@ const Contact = () => {
           className="w-full md:max-w-[480px]"
         />
         <div className="flex flex-col justify-center items-start gap-6">
-          <p className="font-semibold text-xl text-gray-600">Our Store</p>
+          <p className="font-semibold text-xl text-gray-600">Về chúng tôi</p>
           <p className="text-gray-500">
-            Infocity,Chandrasekharpur <br />
-            Bhubaneswar,Odisha-751024
-          </p>
-          <p className="text-gray-500">
-            Tel: +12-34567-89012 <br /> Email: Forever@example.com
-          </p>
-          <p className="font-semibold text-xl text-gray-600">
-            Careers at Forever
+          Số 688 Đường Quang Trung, <br />
+          Phường La Khê, Quận Hà Đông, Thành phố Hà Nội
           </p>
           <p className="text-gray-500">
-            Learn more about our teams and job opening.
+            Tel: +12-34567-89012 <br /> Email: hello@canifa.com
           </p>
-          <button className="border border-black px-8 py-4 text-sm hover:bg-black hover:text-white transition-all duration-500">
-            Explore Jobs
-          </button>
+
+
         </div>
       </div>
       <NewsLetterBox />
