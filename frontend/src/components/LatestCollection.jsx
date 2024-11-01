@@ -21,9 +21,7 @@ const LatestCollection = () => {
       <div className="text-center py-8 text-3xl">
         <Title text1={"LATEST"} text2={"COLLECTIONS"} />
         <p className="w-3/4 m-auto text-xs sm:text-sm md:text-base text-gray-600">
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Excepturi,
-          amet doloremque asperiores, distinctio ipsum optio velit nemo rerum
-          reprehenderit, eaque ducimus ut repudiandae veniam illo!
+        Discover the latest collections at CANIFA, where fashion perfectly blends modern style with practicality. From everyday outfits to elegant garments, each piece is meticulously crafted with high-quality materials.
         </p>
       </div>
       {/* Rendering Products */}

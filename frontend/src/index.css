@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Prata&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&family=Prata&display=swap");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -6,9 +6,11 @@
 a.active hr {
   @apply block;
 }
+
 * {
-  font-family: Outfit;
+  font-family: Montserrat;
 }
+
 .prata-regular {
   font-family: "Prata", serif;
   font-weight: 400;

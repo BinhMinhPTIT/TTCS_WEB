@@ -55,8 +55,14 @@ import p_img51 from './p_img51.png'
 import p_img52 from './p_img52.png'
 
 
-import logo from './logo.png'
+import logo from './canifa_logo.png'
 import hero_img from './hero_img.png'
+import hero_store1 from './hero_store1.png'
+import canifa1 from './canifa1.png'
+import canifa2 from './canifa2.png'
+import canifa3 from './canifa3.png'
+import canifa4 from './canifa4.png'
+import hero_2 from './hero_2.jpg'
 import cart_icon from './cart_icon.png'
 import bin_icon from './bin_icon.png'
 import dropdown_icon from './dropdown_icon.png'
@@ -77,6 +83,12 @@ import cross_icon from './cross_icon.png'
 export const assets = {
     logo,
     hero_img,
+    hero_store1,
+    hero_2,
+    canifa1,
+    canifa2,
+    canifa3,
+    canifa4,
     cart_icon,
     dropdown_icon,
     exchange_icon,
