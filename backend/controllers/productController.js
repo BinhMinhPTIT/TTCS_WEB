@@ -55,11 +55,12 @@ const addProduct = async (req, res) => {
 
 // Function for list product
 const listProduct = async (req, res) => {
+  console.log("List Product Route Accessed");
   try {
     const products = await productModel.find({});
     res.json({ success: true, products });
   } catch (error) {
-    console.log(error);
+    console.error("Error fetching products:", error);
     res.json({ success: false, message: error.message });
   }
 };
@@ -87,4 +88,22 @@ const singleProduct = async (req, res) => {
   }
 };
 
-export { addProduct, listProduct, removeProduct, singleProduct };
+
+const getProductsByCategory = async (req, res) => {
+  try {
+    const { category } = req.query;
+
+    let filter = {};
+    if (category) {
+      filter.category = category;
+    }
+
+    const products = await productModel.find(filter);
+
+    res.status(200).json(products);
+  } catch (error) {
+    res.status(500).json({ message: "Lỗi server", error: error.message });
+  }
+};
+
+export { addProduct, listProduct, removeProduct, singleProduct, getProductsByCategory };
