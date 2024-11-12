@@ -12,5 +12,6 @@ userRouter.post("/register", registerUser);
 userRouter.post("/login", loginUser);
 userRouter.post("/admin", adminLogin);
 userRouter.post("/forgot", changePassword);
+// userRouter.post("/profile/:id", getProfileInfo);
 
 export default userRouter;

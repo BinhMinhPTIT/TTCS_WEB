@@ -142,4 +142,35 @@ const changePassword = async (req, res) => {
   }
 };
 
-export { loginUser, registerUser, adminLogin, changePassword };
+const getProfileInfo = async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    const user = await userModel.findById(userId).select('-password');
+    
+    if (!user) {
+      return res.json({
+        success: false,
+        message: "User not found"
+      });
+    }
+
+    res.json({
+      success: true,
+      user: {
+        name: user.name,
+        email: user.email,
+
+      }
+    });
+
+  } catch (error) {
+    console.log(error);
+    res.json({ 
+      success: false, 
+      message: error.message 
+    });
+  }
+};
+
+export { loginUser, registerUser, adminLogin, changePassword, getProfileInfo };
