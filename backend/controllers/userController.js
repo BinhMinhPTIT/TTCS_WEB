@@ -144,14 +144,21 @@ const changePassword = async (req, res) => {
 
 const getProfileInfo = async (req, res) => {
   try {
-    const userId = req.user._id;
+    const userId = req.body.userId; // Get userId from req.body as set by authUser middleware
 
-    const user = await userModel.findById(userId).select('-password');
-    
+    if (!userId) {
+      return res.json({
+        success: false,
+        message: "User ID is missing. Authorization failed.",
+      });
+    }
+
+    const user = await userModel.findById(userId).select("-password"); // Exclude password from the response
+
     if (!user) {
       return res.json({
         success: false,
-        message: "User not found"
+        message: "User not found",
       });
     }
 
@@ -160,17 +167,62 @@ const getProfileInfo = async (req, res) => {
       user: {
         name: user.name,
         email: user.email,
-
-      }
+        phone: user.phone,
+        address: user.address,
+        profileImage: user.profileImage,
+        dateOfBirth: user.dateOfBirth,
+      },
     });
-
   } catch (error) {
-    console.log(error);
-    res.json({ 
-      success: false, 
-      message: error.message 
+    console.error(error);
+    res.json({
+      success: false,
+      message: error.message,
     });
   }
 };
 
-export { loginUser, registerUser, adminLogin, changePassword, getProfileInfo };
+const updateProfile = async (req, res) => {
+  try {
+    const userId = req.body.userId;
+    const { phone, address, profileImage, dateOfBirth, cartData, wishlist } = req.body;
+
+    const user = await userModel.findById(userId);
+    if (!user) {
+      return res.json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    if (phone !== undefined) user.phone = phone;
+    if (address !== undefined) user.address = { ...user.address, ...address };
+    if (profileImage !== undefined) user.profileImage = profileImage;
+    if (dateOfBirth !== undefined) user.dateOfBirth = dateOfBirth;
+    if (cartData !== undefined) user.cartData = cartData;
+    if (wishlist !== undefined) user.wishlist = wishlist;
+
+    await user.save();
+
+    res.json({
+      success: true,
+      message: "Profile updated successfully",
+      user: {
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        address: user.address,
+        profileImage: user.profileImage,
+        dateOfBirth: user.dateOfBirth,
+        cartData: user.cartData,
+        wishlist: user.wishlist,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  }
+};
+
+
+export { loginUser, registerUser, adminLogin, changePassword, getProfileInfo, updateProfile };

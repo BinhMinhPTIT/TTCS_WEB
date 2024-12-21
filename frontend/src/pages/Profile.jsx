@@ -1,143 +1,237 @@
-import React from 'react';
-import { Package, Heart, Clock, Settings, LogOut, ShoppingBag } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const Profile = () => {
-  // Dữ liệu mẫu
-  const userData = {
-    name: 'Nguyễn Văn A',
-    email: 'nguyenvana@example.com',
-    phone: '0123 456 789',
-    address: '123 Đường ABC, Quận 1, TP. HCM',
-    memberSince: '10/2023',
-    avatar: '/api/placeholder/150/150',
-    orders: [
-      { id: '#12345', date: '15/03/2024', status: 'Đã giao', total: '890.000₫' },
-      { id: '#12344', date: '10/03/2024', status: 'Đang giao', total: '450.000₫' },
-    ],
-    wishlist: [
-      { name: 'Áo khoác jean nam', price: '599.000₫' },
-      { name: 'Quần kaki nam', price: '399.000₫' },
-    ]
+  const [profileData, setProfileData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    address: { street: "", city: "", zipCode: "" },
+    dateOfBirth: "",
+    profileImage: "",
+  });
+  const [isEditing, setIsEditing] = useState(false);
+  const [message, setMessage] = useState("");
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/login");
+    }
+  }, [navigate]);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      try {
+        const response = await axios.get("http://localhost:4000/api/user/profile", {
+          headers: { token },
+        });
+        if (response.data.success) {
+          setProfileData(response.data.user);
+        } else {
+          setMessage(response.data.message || "Failed to fetch profile.");
+        }
+      } catch (error) {
+        console.error(error);
+        setMessage("An error occurred while fetching profile information.");
+      }
+    };
+
+    fetchProfile();
+  }, []);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    if (name.startsWith("address.")) {
+      const field = name.split(".")[1];
+      setProfileData((prev) => ({
+        ...prev,
+        address: { ...prev.address, [field]: value },
+      }));
+    } else {
+      setProfileData((prev) => ({ ...prev, [name]: value }));
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    try {
+      const response = await axios.put(
+        "http://localhost:4000/api/user/profile",
+        profileData,
+        {
+          headers: { token },
+        }
+      );
+      if (response.data.success) {
+        setMessage("Profile updated successfully.");
+        setIsEditing(false);
+      } else {
+        setMessage(response.data.message || "Failed to update profile.");
+      }
+    } catch (error) {
+      console.error(error);
+      setMessage("An error occurred while updating profile.");
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-6xl mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          {/* Sidebar */}
-          <div className="md:col-span-1">
-            <div className="bg-white rounded-lg shadow p-6">
-              <div className="flex flex-col items-center">
+    <div className="max-w-3xl mx-auto p-6 bg-white shadow-md rounded-lg">
+      <h1 className="text-3xl font-semibold mb-6 text-center">Your Profile</h1>
+      {message && <div className="mb-4 text-center text-red-500">{message}</div>}
+
+      {!isEditing ? (
+        <div className="space-y-6">
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              {profileData.profileImage ? (
                 <img
-                  src={userData.avatar}
-                  alt="Avatar"
-                  className="w-24 h-24 rounded-full border-4 border-gray-100 shadow mb-4"
+                  src={profileData.profileImage}
+                  alt="Profile"
+                  className="w-24 h-24 rounded-full shadow-md"
                 />
-                <h2 className="text-xl font-bold mb-1">{userData.name}</h2>
-                <p className="text-sm text-gray-500 mb-4">Thành viên từ {userData.memberSince}</p>
-              </div>
-              
-              <nav className="mt-6 space-y-2">
-                <a href="#" className="flex items-center space-x-3 p-2 rounded-lg bg-blue-50 text-blue-600">
-                  <ShoppingBag size={20} />
-                  <span>Đơn hàng của tôi</span>
-                </a>
-                <a href="#" className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50">
-                  <Heart size={20} />
-                  <span>Danh sách yêu thích</span>
-                </a>
-                <a href="#" className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50">
-                  <Settings size={20} />
-                  <span>Cài đặt tài khoản</span>
-                </a>
-                <a href="#" className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50 text-red-500">
-                  <LogOut size={20} />
-                  <span>Đăng xuất</span>
-                </a>
-              </nav>
+              ) : (
+                <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center text-gray-500">
+                  No Image
+                </div>
+              )}
+            </div>
+            <div className="ml-6">
+              <h2 className="text-xl font-semibold">{profileData.name}</h2>
+              <p className="text-gray-600">{profileData.email}</p>
             </div>
           </div>
-
-          {/* Main Content */}
-          <div className="md:col-span-3">
-            {/* Thông tin cá nhân */}
-            <div className="bg-white rounded-lg shadow mb-6">
-              <div className="p-6">
-                <h3 className="text-lg font-semibold mb-4">Thông tin cá nhân</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm text-gray-600">Email</label>
-                    <p className="font-medium">{userData.email}</p>
-                  </div>
-                  <div>
-                    <label className="block text-sm text-gray-600">Số điện thoại</label>
-                    <p className="font-medium">{userData.phone}</p>
-                  </div>
-                  <div className="md:col-span-2">
-                    <label className="block text-sm text-gray-600">Địa chỉ giao hàng</label>
-                    <p className="font-medium">{userData.address}</p>
-                  </div>
-                </div>
-              </div>
+          <div className="grid grid-cols-2 gap-6">
+            <div>
+              <strong className="block text-gray-700">Phone:</strong>
+              <span>{profileData.phone || "Not Provided"}</span>
             </div>
-
-            {/* Đơn hàng gần đây */}
-            <div className="bg-white rounded-lg shadow mb-6">
-              <div className="p-6">
-                <h3 className="text-lg font-semibold mb-4">Đơn hàng gần đây</h3>
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="text-left border-b">
-                        <th className="pb-3">Mã đơn hàng</th>
-                        <th className="pb-3">Ngày đặt</th>
-                        <th className="pb-3">Trạng thái</th>
-                        <th className="pb-3">Tổng tiền</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {userData.orders.map(order => (
-                        <tr key={order.id} className="border-b hover:bg-gray-50">
-                          <td className="py-4">{order.id}</td>
-                          <td className="py-4">{order.date}</td>
-                          <td className="py-4">
-                            <span className={`px-2 py-1 rounded-full text-sm ${
-                              order.status === 'Đã giao' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'
-                            }`}>
-                              {order.status}
-                            </span>
-                          </td>
-                          <td className="py-4">{order.total}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+            <div>
+              <strong className="block text-gray-700">Date of Birth:</strong>
+              <span>
+                {profileData.dateOfBirth
+                  ? new Date(profileData.dateOfBirth).toLocaleDateString()
+                  : "Not Provided"}
+              </span>
             </div>
-
-            {/* Danh sách yêu thích */}
-            <div className="bg-white rounded-lg shadow">
-              <div className="p-6">
-                <h3 className="text-lg font-semibold mb-4">Danh sách yêu thích</h3>
-                <div className="space-y-4">
-                  {userData.wishlist.map((item, index) => (
-                    <div key={index} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50">
-                      <div>
-                        <h4 className="font-medium">{item.name}</h4>
-                        <p className="text-blue-600">{item.price}</p>
-                      </div>
-                      <button className="px-4 py-2 text-sm text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50">
-                        Thêm vào giỏ
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
+            <div className="col-span-2">
+              <strong className="block text-gray-700">Address:</strong>
+              <span>
+                {`${profileData.address.street}, ${profileData.address.city}, ${profileData.address.zipCode}`}
+              </span>
             </div>
+          </div>
+          <div className="text-center">
+            <button
+              onClick={() => setIsEditing(true)}
+              className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            >
+              Edit Profile
+            </button>
           </div>
         </div>
-      </div>
+      ) : (
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-cols-2 gap-6">
+            <div>
+              <label className="block font-medium text-gray-700">Name</label>
+              <input
+                type="text"
+                name="name"
+                value={profileData.name}
+                onChange={handleChange}
+                className="w-full p-2 border rounded"
+              />
+            </div>
+            <div>
+              <label className="block font-medium text-gray-700">Phone</label>
+              <input
+                type="text"
+                name="phone"
+                value={profileData.phone}
+                onChange={handleChange}
+                className="w-full p-2 border rounded"
+              />
+            </div>
+            <div>
+              <label className="block font-medium text-gray-700">Date of Birth</label>
+              <input
+                type="date"
+                name="dateOfBirth"
+                value={profileData.dateOfBirth?.split("T")[0] || ""}
+                onChange={handleChange}
+                className="w-full p-2 border rounded"
+              />
+            </div>
+            <div>
+              <label className="block font-medium text-gray-700">Profile Image URL</label>
+              <input
+                type="text"
+                name="profileImage"
+                value={profileData.profileImage}
+                onChange={handleChange}
+                className="w-full p-2 border rounded"
+              />
+            </div>
+          </div>
+          <div>
+            <label className="block font-medium text-gray-700">Street</label>
+            <input
+              type="text"
+              name="address.street"
+              value={profileData.address.street}
+              onChange={handleChange}
+              className="w-full p-2 border rounded"
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-6">
+            <div>
+              <label className="block font-medium text-gray-700">City</label>
+              <input
+                type="text"
+                name="address.city"
+                value={profileData.address.city}
+                onChange={handleChange}
+                className="w-full p-2 border rounded"
+              />
+            </div>
+            <div>
+              <label className="block font-medium text-gray-700">Zip Code</label>
+              <input
+                type="text"
+                name="address.zipCode"
+                value={profileData.address.zipCode}
+                onChange={handleChange}
+                className="w-full p-2 border rounded"
+              />
+            </div>
+          </div>
+          <div className="flex justify-end space-x-4">
+            <button
+              type="button"
+              onClick={() => setIsEditing(false)}
+              className="px-6 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+            >
+              Save Changes
+            </button>
+          </div>
+        </form>
+      )}
     </div>
   );
 };

@@ -4,14 +4,21 @@ import {
   registerUser,
   adminLogin,
   changePassword,
+  getProfileInfo,
+  updateProfile,
 } from "../controllers/userController.js";
+import authUser from "../middleware/auth.js";
 
 const userRouter = express.Router();
 
-userRouter.post("/register", registerUser);
-userRouter.post("/login", loginUser);
-userRouter.post("/admin", adminLogin);
-userRouter.post("/forgot", changePassword);
-// userRouter.post("/profile/:id", getProfileInfo);
+// Public Routes
+userRouter.post("/register", registerUser); // User registration
+userRouter.post("/login", loginUser); // User login
+userRouter.post("/admin", adminLogin); // Admin login
+userRouter.post("/forgot", changePassword); // Password change
+
+// Protected Routes
+userRouter.get("/profile", authUser, getProfileInfo); // Get user profile
+userRouter.put("/profile", authUser, updateProfile); // Update user profile
 
 export default userRouter;

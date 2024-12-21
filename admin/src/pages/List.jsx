@@ -134,19 +134,11 @@ const List = ({ token }) => {
               {currency}
               {item.price}
             </p>
-            <p className="flex justify-between items-center">
-              <span
-                className="cursor-pointer text-lg text-blue-500"
-                onClick={() => handleEdit(item)}  // Trigger edit
-              >
-                Edit
-              </span>
-              <span
-                className="cursor-pointer text-lg text-red-400"
-                onClick={() => removeProduct(item._id)}  // Remove product
-              >
-                X
-              </span>
+            <p
+              className="text-right md:text-center cursor-pointer text-lg text-red-400"
+              onClick={() => removeProduct(item._id)}
+            >
+              X
             </p>
           </div>
         ))}
