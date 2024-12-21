@@ -17,6 +17,8 @@ import "react-toastify/dist/ReactToastify.css";
 import { Verify } from "./pages/Verify";
 import { ForgotPassword } from "./pages/ForgotPassword";
 import { Store } from "./pages/Store";
+import BlogPage from './pages/BlogPage'; // Import Blog Page
+import BlogDetail from './pages/BlogDetail';
 
 const App = () => {
   return (
@@ -38,6 +40,8 @@ const App = () => {
         <Route path="/verify" element={<Verify />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/store" element={<Store />} />
+        <Route path="/blog" element={<BlogPage />} />
+        <Route path="/blog/:id" element={<BlogDetail />} />
       </Routes>
       <Footer />
     </div>

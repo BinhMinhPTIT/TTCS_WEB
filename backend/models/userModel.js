@@ -7,7 +7,7 @@ const userSchema = new mongoose.Schema(
     password: { type: String, required: true },
     cartData: { type: Object, default: {} },
     phone: { type: String, default: "" },
-    address: { 
+    address: {
       street: { type: String, default: "" },
       city: { type: String, default: "" },
       zipCode: { type: String, default: "" }
@@ -15,9 +15,10 @@ const userSchema = new mongoose.Schema(
     dateOfBirth: { type: Date },
     profileImage: { type: String, default: "" },
     wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: "product" }],
+    reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: "review" }], // Added reviews reference
     lastLogin: { type: Date },
   },
-  { 
+  {
     minimize: false,
     timestamps: true
   }

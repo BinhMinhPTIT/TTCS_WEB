@@ -8,6 +8,7 @@ import List from "./pages/List";
 import Orders from "./pages/Orders";
 import Login from "./components/Login";
 import { ToastContainer } from "react-toastify";
+import BlogManagement from "./pages/BlogManagement"; // Import trang BlogManagement
 import "react-toastify/dist/ReactToastify.css";
 
 export const backEndURL = "http://localhost:4000";
@@ -39,6 +40,7 @@ const App = () => {
                 <Route path="/edit" element={<Edit token={token} />} />
                 <Route path="/list" element={<List token={token} />} />
                 <Route path="/orders" element={<Orders token={token} />} />
+                <Route path="/blog-management" element={<BlogManagement token={token} />} />
               </Routes>
             </div>
           </div>

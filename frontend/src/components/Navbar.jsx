@@ -21,6 +21,7 @@ const Navbar = () => {
     navigate("/login");
     setCartItems({});
   };
+
   return (
     <div className="flex items-center justify-between py-5 font-medium">
       <Link to="/">
@@ -47,6 +48,11 @@ const Navbar = () => {
           <p>Store</p>
           <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 hidden" />
         </NavLink>
+        {/* Blog Link */}
+        <NavLink className="flex flex-col items-center gap-1" to="/blog">
+          <p>Blog</p>
+          <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 hidden" />
+        </NavLink>
       </ul>
 
       <div className="flex items-center gap-6">
@@ -69,15 +75,10 @@ const Navbar = () => {
           {token ? (
             <div className="group-hover:block hidden absolute dropdown-menu right-0 pt-4" style={{ zIndex: 50 }}>
               <div className="flex flex-col gap-2 w-36 py-3 px-5 bg-slate-100 text-gray-500 rounded">
-                <p className="cursor-pointer hover:text-black"
-                  onClick={() => navigate("/profile")}
-                >
+                <p className="cursor-pointer hover:text-black" onClick={() => navigate("/profile")}>
                   My Profile
                 </p>
-                <p
-                  className="cursor-pointer hover:text-black"
-                  onClick={() => navigate("/orders")}
-                >
+                <p className="cursor-pointer hover:text-black" onClick={() => navigate("/orders")}>
                   Orders
                 </p>
                 <p className="cursor-pointer hover:text-black" onClick={logout}>
@@ -100,6 +101,7 @@ const Navbar = () => {
           onClick={() => setVisible(true)}
         />
       </div>
+
       {/* Side bar hamburger menu for smaller screen */}
       <div
         className={`absolute top-0 right-0 bottom-0 overflow-hidden bg-white transition-all ${visible ? "w-full" : "w-0"
@@ -148,10 +150,17 @@ const Navbar = () => {
           <NavLink
             className="py-4 pl-6 border"
             onClick={() => setVisible(false)}
-            to="https://forever-admin-pannel.vercel.app"
-            target="_blank"
+            to="/store"
           >
-            <p>Admin Panel</p>
+            <p>Store</p>
+          </NavLink>
+          {/* Blog Link for mobile */}
+          <NavLink
+            className="py-4 pl-6 border"
+            onClick={() => setVisible(false)}
+            to="/blog"
+          >
+            <p>Blog</p>
           </NavLink>
         </div>
       </div>

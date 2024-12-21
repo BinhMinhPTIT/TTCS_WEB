@@ -55,7 +55,6 @@ const addProduct = async (req, res) => {
 
 // Function for list product
 const listProduct = async (req, res) => {
-  console.log("List Product Route Accessed");
   try {
     const products = await productModel.find({});
     res.json({ success: true, products });
