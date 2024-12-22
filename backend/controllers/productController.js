@@ -105,32 +105,22 @@ const getProductsByCategory = async (req, res) => {
   }
 };
 
-// Function for editing product
 const editProduct = async (req, res) => {
   try {
-    const { productId } = req.body; 
-    const {
-      name,
-      description,
-      price,
-      category,
-      subCategory,
-      sizes,
-      bestseller,
-    } = req.body;
+    const { productId } = req.body;
+    if (!productId) {
+      return res.status(400).json({ success: false, message: "Product ID is required" });
+    }
 
-    const image1 = req.files?.image1?.[0] || null;
-    const image2 = req.files?.image2?.[0] || null;
-    const image3 = req.files?.image3?.[0] || null;
-    const image4 = req.files?.image4?.[0] || null;
+    const { name, description, price, category, subCategory, sizes, bestseller } = req.body;
 
-    const images = [image1, image2, image3, image4].filter(item => item !== null);
+    const images = req.files ? Object.values(req.files).map(file => file[0]) : [];
 
     let imagesUrl = [];
     if (images.length > 0) {
       imagesUrl = await Promise.all(
         images.map(async (item) => {
-          let result = await cloudinary.uploader.upload(item.path, {
+          const result = await cloudinary.uploader.upload(item.path, {
             resource_type: "image",
           });
           return result.secure_url;
@@ -141,18 +131,21 @@ const editProduct = async (req, res) => {
     const updatedProductData = {
       name,
       description,
-      category,
       price: Number(price),
+      category,
       subCategory,
-      bestseller: bestseller === "true" ? true : false,
       sizes: JSON.parse(sizes),
-      image: imagesUrl.length > 0 ? imagesUrl : undefined, 
+      bestseller: bestseller === "true",
     };
+
+    if (imagesUrl.length > 0) {
+      updatedProductData.image = imagesUrl;
+    }
 
     const updatedProduct = await productModel.findByIdAndUpdate(
       productId,
       updatedProductData,
-      { new: true } 
+      { new: true }
     );
 
     if (!updatedProduct) {
@@ -161,10 +154,11 @@ const editProduct = async (req, res) => {
 
     res.json({ success: true, message: "Product updated successfully", updatedProduct });
   } catch (error) {
-    console.error(error);
+    console.error("Error updating product:", error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
 
 
 export { addProduct, listProduct, removeProduct, singleProduct, getProductsByCategory, editProduct };

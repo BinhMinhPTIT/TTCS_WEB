@@ -3,17 +3,20 @@ import Review from '../models/reviewModel.js';
 import Product from '../models/productModel.js';
 import User from '../models/userModel.js';
 
+
 // Create new review
 export const createReview = async (req, res) => {
   try {
-    const { userId, productId, rating, comment, images } = req.body;
+    // Assuming userId is available in the request via authentication middleware
+    const userId = req.user.id; // Access userId from req.user if using JWT or other auth method
+    const { productId, rating, comment, images } = req.body;
 
     // Check if user already reviewed this product
     const existingReview = await Review.findOne({ userId, productId });
     if (existingReview) {
-      return res.json({ 
-        success: false, 
-        message: "You have already reviewed this product" 
+      return res.json({
+        success: false,
+        message: "You have already reviewed this product"
       });
     }
 
@@ -50,20 +53,21 @@ export const createReview = async (req, res) => {
   }
 };
 
+
 // Get product reviews
 export const getProductReviews = async (req, res) => {
   try {
     const { productId } = req.params;
-    
+
     // Check if the product exists
-    const product = await productModel.findById(productId);
+    const product = await Product.findById(productId);
     if (!product) {
       return res.status(404).json({ success: false, message: 'Product not found' });
     }
 
     // Get reviews for the product
-    const reviews = await reviewModel.find({ productId }).populate('userId', 'name profileImage');
-    
+    const reviews = await Review.find({ productId }).populate('userId', 'name profileImage');
+
     res.status(200).json({ success: true, data: { reviews } });
   } catch (error) {
     console.error('Error fetching reviews:', error);
@@ -103,25 +107,26 @@ export const getUserReviews = async (req, res) => {
 export const updateReview = async (req, res) => {
   try {
     const { reviewId } = req.params;
-    const { userId, rating, comment, images } = req.body;
+    const userId = req.user.id; // From auth middleware
+    const { rating, comment, images } = req.body;
 
     const review = await Review.findById(reviewId);
     if (!review) {
-      return res.json({ 
-        success: false, 
-        message: "Review not found" 
+      return res.status(404).json({
+        success: false,
+        message: "Review not found"
       });
     }
 
     // Check if user owns the review
     if (review.userId.toString() !== userId) {
-      return res.json({ 
-        success: false, 
-        message: "Not authorized to update this review" 
+      return res.status(403).json({
+        success: false,
+        message: "Not authorized to update this review"
       });
     }
 
-    // Update product's average rating
+    // Update product rating
     const product = await Product.findById(review.productId);
     const totalRatings = product.totalReviews * product.averageRating;
     product.averageRating = (totalRatings - review.rating + rating) / product.totalReviews;
@@ -139,8 +144,8 @@ export const updateReview = async (req, res) => {
       data: review
     });
   } catch (error) {
-    console.log(error);
-    res.json({ success: false, message: error.message });
+    console.error(error);
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
@@ -148,25 +153,25 @@ export const updateReview = async (req, res) => {
 export const deleteReview = async (req, res) => {
   try {
     const { reviewId } = req.params;
-    const { userId } = req.body;
+    const userId = req.user.id; // From auth middleware
 
     const review = await Review.findById(reviewId);
     if (!review) {
-      return res.json({ 
-        success: false, 
-        message: "Review not found" 
+      return res.status(404).json({
+        success: false,
+        message: "Review not found"
       });
     }
 
     // Check if user owns the review
     if (review.userId.toString() !== userId) {
-      return res.json({ 
-        success: false, 
-        message: "Not authorized to delete this review" 
+      return res.status(403).json({
+        success: false,
+        message: "Not authorized to delete this review"
       });
     }
 
-    // Update product's review stats
+    // Update product stats
     const product = await Product.findById(review.productId);
     const totalRatings = product.totalReviews * product.averageRating;
     product.totalReviews -= 1;
@@ -178,43 +183,42 @@ export const deleteReview = async (req, res) => {
     product.reviews = product.reviews.filter(r => r.toString() !== reviewId);
     await product.save();
 
-    // Remove review from user's reviews
+    // Remove from user's reviews
     await User.findByIdAndUpdate(userId, {
       $pull: { reviews: reviewId }
     });
 
     await Review.findByIdAndDelete(reviewId);
-    
-    res.json({ 
-      success: true, 
-      message: "Review deleted successfully" 
+
+    res.json({
+      success: true,
+      message: "Review deleted successfully"
     });
   } catch (error) {
-    console.log(error);
-    res.json({ success: false, message: error.message });
+    console.error(error);
+    res.status(500).json({ success: false, message: error.message });
   }
 };
+
 
 // Like/unlike review
 export const likeReview = async (req, res) => {
   try {
     const { reviewId } = req.params;
-    const { userId } = req.body;
+    const userId = req.user.id; // From auth middleware
 
     const review = await Review.findById(reviewId);
     if (!review) {
-      return res.json({ 
-        success: false, 
-        message: "Review not found" 
+      return res.status(404).json({
+        success: false,
+        message: "Review not found"
       });
     }
 
     const likeIndex = review.likes.indexOf(userId);
     if (likeIndex === -1) {
-      // Like review
       review.likes.push(userId);
     } else {
-      // Unlike review
       review.likes.splice(likeIndex, 1);
     }
     await review.save();
@@ -225,7 +229,7 @@ export const likeReview = async (req, res) => {
       data: review
     });
   } catch (error) {
-    console.log(error);
-    res.json({ success: false, message: error.message });
+    console.error(error);
+    res.status(500).json({ success: false, message: error.message });
   }
 };

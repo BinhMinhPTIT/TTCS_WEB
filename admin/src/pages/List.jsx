@@ -50,6 +50,7 @@ const List = ({ token }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
       const formData = new FormData();
       formData.append("productId", selectedProductId);
@@ -61,11 +62,12 @@ const List = ({ token }) => {
       formData.append("sizes", editProductData.sizes);
       formData.append("bestseller", editProductData.bestseller);
 
+      // Thêm các file ảnh vào FormData
       Array.from(editProductData.images).forEach((image, index) => {
         formData.append(`image${index + 1}`, image);
       });
 
-      const response = await axios.post(backEndURL + "/api/product/edit", formData, {
+      const response = await axios.put(backEndURL + "/api/product/edit", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
           token,
@@ -74,8 +76,8 @@ const List = ({ token }) => {
 
       if (response.data.success) {
         toast.success("Product updated successfully!");
-        fetchList();  // Refresh the product list
-        setIsEditing(false);  // Close the modal
+        fetchList(); // Làm mới danh sách sản phẩm
+        setIsEditing(false); // Đóng modal
       } else {
         toast.error(response.data.message);
       }
@@ -84,6 +86,7 @@ const List = ({ token }) => {
       console.error(error);
     }
   };
+
 
   const removeProduct = async (id) => {
     try {
@@ -134,136 +137,141 @@ const List = ({ token }) => {
               {currency}
               {item.price}
             </p>
-            <p
-              className="text-right md:text-center cursor-pointer text-lg text-red-400"
-              onClick={() => removeProduct(item._id)}
-            >
-              X
-            </p>
+            <div className="flex justify-end md:justify-center ">
+              {/* <button
+                className="text-blue-500 hover:underline"
+                onClick={() => handleEdit(item)}
+              >
+                Edit
+              </button> */}
+              <p
+                className="cursor-pointer text-lg text-red-400"
+                onClick={() => removeProduct(item._id)}
+              >
+                X
+              </p>
+            </div>
           </div>
         ))}
+
       </div>
 
       {/* Modal for Editing Product */}
+      {/* Modal for Editing Product */}
       {isEditing && (
         <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
-          <div
-            style={{
-              backgroundColor: "#fff",
-              padding: "20px",
-              width: "100%",
-              maxWidth: "800px", // Increased width for the horizontal layout
-              borderRadius: "8px",
-              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-              overflowY: "auto", // Ensures that the modal scrolls if the content exceeds
-            }}
-          >
-            <h3 style={{ textAlign: "center", marginBottom: "20px" }}>Edit Product</h3>
-            <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-6">
-              {/* Left Section */}
-              <div className="flex flex-col">
-                <label>Name:</label>
-                <input
-                  type="text"
-                  value={editProductData.name}
-                  onChange={(e) => setEditProductData({ ...editProductData, name: e.target.value })}
-                  style={{ padding: "8px", border: "1px solid #ccc", marginBottom: "10px" }}
-                />
-
-                <label>Description:</label>
+          <div className="bg-white p-6 rounded-md shadow-md w-full max-w-3xl">
+            <h2 className="text-lg font-semibold mb-4">Edit Product</h2>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium">Name:</label>
+                  <input
+                    type="text"
+                    value={editProductData.name}
+                    onChange={(e) =>
+                      setEditProductData({ ...editProductData, name: e.target.value })
+                    }
+                    className="w-full border rounded p-2"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium">Category:</label>
+                  <input
+                    type="text"
+                    value={editProductData.category}
+                    onChange={(e) =>
+                      setEditProductData({ ...editProductData, category: e.target.value })
+                    }
+                    className="w-full border rounded p-2"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium">Description:</label>
                 <textarea
                   value={editProductData.description}
-                  onChange={(e) => setEditProductData({ ...editProductData, description: e.target.value })}
-                  style={{ padding: "8px", border: "1px solid #ccc", marginBottom: "10px" }}
-                />
-
-                <label>Price:</label>
-                <input
-                  type="number"
-                  value={editProductData.price}
-                  onChange={(e) => setEditProductData({ ...editProductData, price: e.target.value })}
-                  style={{ padding: "8px", border: "1px solid #ccc", marginBottom: "10px" }}
-                />
-
-                <label>Category:</label>
-                <input
-                  type="text"
-                  value={editProductData.category}
-                  onChange={(e) => setEditProductData({ ...editProductData, category: e.target.value })}
-                  style={{ padding: "8px", border: "1px solid #ccc", marginBottom: "10px" }}
+                  onChange={(e) =>
+                    setEditProductData({
+                      ...editProductData,
+                      description: e.target.value,
+                    })
+                  }
+                  className="w-full border rounded p-2"
                 />
               </div>
-
-              {/* Right Section */}
-              <div className="flex flex-col">
-                <label>Sub Category:</label>
-                <input
-                  type="text"
-                  value={editProductData.subCategory}
-                  onChange={(e) => setEditProductData({ ...editProductData, subCategory: e.target.value })}
-                  style={{ padding: "8px", border: "1px solid #ccc", marginBottom: "10px" }}
-                />
-
-                <label>Sizes (JSON format):</label>
-                <textarea
-                  value={editProductData.sizes}
-                  onChange={(e) => setEditProductData({ ...editProductData, sizes: e.target.value })}
-                  style={{ padding: "8px", border: "1px solid #ccc", marginBottom: "10px" }}
-                />
-
-                <label>Bestseller:</label>
-                <input
-                  type="checkbox"
-                  checked={editProductData.bestseller}
-                  onChange={(e) => setEditProductData({ ...editProductData, bestseller: e.target.checked })}
-                  style={{ marginTop: "5px" }}
-                />
-
-                <label>Images:</label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium">Price:</label>
+                  <input
+                    type="number"
+                    value={editProductData.price}
+                    onChange={(e) =>
+                      setEditProductData({ ...editProductData, price: e.target.value })
+                    }
+                    className="w-full border rounded p-2"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium">Bestseller:</label>
+                  <input
+                    type="checkbox"
+                    checked={editProductData.bestseller}
+                    onChange={(e) =>
+                      setEditProductData({
+                        ...editProductData,
+                        bestseller: e.target.checked,
+                      })
+                    }
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium">Images:</label>
+                <div className="flex gap-2 mb-2">
+                  {editProductData.images &&
+                    editProductData.images.map((img, index) => (
+                      <img
+                        key={index}
+                        src={typeof img === "string" ? img : URL.createObjectURL(img)}
+                        alt={`Preview ${index}`}
+                        className="w-12 h-12 object-cover border rounded"
+                      />
+                    ))}
+                </div>
                 <input
                   type="file"
                   multiple
-                  onChange={(e) => setEditProductData({ ...editProductData, images: e.target.files })}
-                  style={{ marginTop: "5px" }}
+                  onChange={(e) =>
+                    setEditProductData({
+                      ...editProductData,
+                      images: [...Array.from(e.target.files)],
+                    })
+                  }
+                  className="w-full border rounded p-2"
                 />
               </div>
-
-              <div className="col-span-2">
+              <div className="flex justify-end">
                 <button
                   type="submit"
-                  style={{
-                    width: "100%",
-                    padding: "10px",
-                    backgroundColor: "#007BFF",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "4px",
-                    cursor: "pointer",
-                    marginTop: "20px",
-                  }}
+                  className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
                 >
                   Save Changes
                 </button>
+                <button
+                  type="button"
+                  onClick={() => setIsEditing(false)}
+                  className="ml-2 bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600"
+                >
+                  Cancel
+                </button>
               </div>
             </form>
-
-            <button
-              onClick={() => setIsEditing(false)}  // Close the modal
-              style={{
-                marginTop: "20px",
-                backgroundColor: "gray",
-                color: "white",
-                padding: "8px 20px",
-                border: "none",
-                borderRadius: "4px",
-                cursor: "pointer",
-              }}
-            >
-              Close
-            </button>
           </div>
         </div>
       )}
+
+
     </>
   );
 };

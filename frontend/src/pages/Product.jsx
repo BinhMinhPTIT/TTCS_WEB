@@ -55,12 +55,15 @@ const Product = () => {
         <div className="flex-1">
           <h1 className="font-medium text-2xl mt-2">{productData.name}</h1>
           <div className="flex items-center gap-1 mt-2">
-            <img src={assets.star_icon} alt="" className="w-3" />
-            <img src={assets.star_icon} alt="" className="w-3" />
-            <img src={assets.star_icon} alt="" className="w-3" />
-            <img src={assets.star_icon} alt="" className="w-3" />
-            <img src={assets.star_dull_icon} alt="" className="w-3" />
-            <p className="pl-2">(122)</p>
+            {Array.from({ length: 5 }, (_, index) => (
+              <img
+                key={index}
+                src={assets.star_icon}
+                alt="star"
+                className={`w-3 ${index < productData.averageRating ? 'text-yellow-500' : 'text-gray-400'}`}
+              />
+            ))}
+            <p className="pl-2">({productData.totalReviews})</p>
           </div>
           <p className="mt-5 text-3xl font-medium">
             {currency}
@@ -75,9 +78,8 @@ const Product = () => {
               {productData.sizes.map((item, index) => (
                 <button
                   key={index}
-                  className={`border py-2 px-4 bg-gray-100 ${
-                    item === size ? "border-orange-500" : ""
-                  }`}
+                  className={`border py-2 px-4 bg-gray-100 ${item === size ? "border-orange-500" : ""
+                    }`}
                   onClick={() => setSize(item)}
                 >
                   {item}
@@ -103,7 +105,6 @@ const Product = () => {
       <div className="mt-20">
         <div className="flex">
           <b className="border px-5 py-3 text-sm">Description</b>
-          <p className="border px-5 py-3 text-sm">Reviews(122)</p>
         </div>
         <div className="flex flex-col gap-4 border px-6 py-6 text-sm text-gray-500">
           <p>
@@ -112,10 +113,10 @@ const Product = () => {
         </div>
       </div>
 
-      {/* <ProductReviews 
-        productId={productId} 
+      <ProductReviews
+        productId={productId}
         token={localStorage.getItem('token')} // Pass the auth token
-      /> */}
+      />
 
 
       {/* Display related products */}

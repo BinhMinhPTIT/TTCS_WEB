@@ -4,25 +4,29 @@ import { Editor } from "@tinymce/tinymce-react";
 const BlogEditor = ({ onSave, blog }) => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [thumbnail, setThumbnail] = useState("");
 
   useEffect(() => {
     if (blog) {
       setTitle(blog.title || ""); // Đảm bảo không null
       setContent(blog.content || ""); // Đảm bảo không null
+      setThumbnail(blog.thumbnail || ""); // Đảm bảo không null
     } else {
       setTitle("");
       setContent("");
+      setThumbnail("");
     }
   }, [blog]);
-  
+
 
   const handleSave = () => {
-    console.log({ title, content }); // Kiểm tra dữ liệu gửi đi
-    onSave({ title, content });
+    console.log({ title, content, thumbnail }); // Kiểm tra dữ liệu gửi đi
+    onSave({ title, content, thumbnail });
     setTitle("");
     setContent("");
+    setThumbnail("");
   };
-  
+
 
   return (
     <div className="p-4 border rounded mb-4 bg-white">
@@ -34,6 +38,16 @@ const BlogEditor = ({ onSave, blog }) => {
           onChange={(e) => setTitle(e.target.value)}
           className="w-full border p-2 rounded mb-4"
           placeholder="Nhập tiêu đề bài viết..."
+        />
+      </div>
+      <div>
+        <label className="block mb-2 font-semibold">Ảnh đại diện:</label>
+        <input
+          type="text"
+          value={thumbnail}
+          onChange={(e) => setThumbnail(e.target.value)}
+          className="w-full border p-2 rounded mb-4"
+          placeholder="Nhập URL ảnh đại diện..."
         />
       </div>
       <div>

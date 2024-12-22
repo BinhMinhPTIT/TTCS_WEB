@@ -1,4 +1,5 @@
 import express from 'express';
+import { authMiddleware } from '../middleware/authMiddleware.js';
 import {
   createReview,
   getProductReviews,
@@ -10,12 +11,14 @@ import {
 
 const router = express.Router();
 
-// Review routes
-router.post('/create', createReview);
+// Protected routes - require authentication
+router.post('/create', authMiddleware, createReview);
+router.post('/like/:reviewId', authMiddleware, likeReview);
+router.put('/update/:reviewId', authMiddleware, updateReview);
+router.delete('/delete/:reviewId', authMiddleware, deleteReview);
+
+// Public routes
 router.get('/product/:productId', getProductReviews);
 router.get('/user/:userId', getUserReviews);
-router.put('/update/:reviewId', updateReview);
-router.delete('/delete/:reviewId', deleteReview);
-router.post('/like/:reviewId', likeReview);
 
 export default router;

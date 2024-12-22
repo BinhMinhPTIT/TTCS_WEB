@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
 import { assets } from '../assets/assets';
 
-const ProductReviews = ({ productId, token }) => {
+const ProductReviews = ({ productId, token, userId }) => {
   const [reviews, setReviews] = useState([]);
   const [userReview, setUserReview] = useState({
     rating: 5,
     comment: '',
     images: [],
   });
+  const [editingReview, setEditingReview] = useState(null);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -20,23 +21,11 @@ const ProductReviews = ({ productId, token }) => {
       const response = await fetch(
         `http://localhost:4000/api/reviews/product/${productId}?page=${page}&limit=5`
       );
-      
-      const textResponse = await response.text();
-      console.log('Raw API Response:', textResponse);
-      
-      let data;
-      try {
-        data = JSON.parse(textResponse);
-      } catch (parseError) {
-        console.error('JSON Parse Error:', parseError);
-        return;
-      }
+      const data = await response.json();
 
       if (data?.success) {
         setReviews(data.data.reviews || []);
         setTotalPages(data.data.totalPages || 1);
-      } else {
-        console.error('API Error:', data);
       }
     } catch (error) {
       console.error('Network Error:', error);
@@ -57,7 +46,7 @@ const ProductReviews = ({ productId, token }) => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          token,
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
           productId,
@@ -65,16 +54,7 @@ const ProductReviews = ({ productId, token }) => {
         }),
       });
 
-      const textResponse = await response.text();
-      console.log('Submit Review Response:', textResponse);
-
-      let data;
-      try {
-        data = JSON.parse(textResponse);
-      } catch (parseError) {
-        setError('Invalid server response');
-        return;
-      }
+      const data = await response.json();
 
       if (data.success) {
         setUserReview({ rating: 5, comment: '', images: [] });
@@ -84,11 +64,101 @@ const ProductReviews = ({ productId, token }) => {
         setError(data.message || 'Error submitting review');
       }
     } catch (error) {
-      console.error('Submit Review Error:', error);
       setError('Error submitting review');
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  // Edit review
+  const handleEditReview = async (e) => {
+    e.preventDefault();
+    if (!token) {
+      setError('Please login to edit review');
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const response = await fetch(`http://localhost:4000/api/reviews/update/${editingReview._id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          userId,
+          rating: userReview.rating,
+          comment: userReview.comment,
+          images: userReview.images,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setEditingReview(null);
+        setUserReview({ rating: 5, comment: '', images: [] });
+        fetchReviews();
+        setSelectedTab('reviews');
+      } else {
+        setError(data.message || 'Error updating review');
+      }
+    } catch (error) {
+      setError('Error updating review');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Delete review
+  const handleDeleteReview = async (reviewId) => {
+    if (!token) {
+      setError('Please login to delete review');
+      return;
+    }
+
+    if (!window.confirm('Are you sure you want to delete this review?')) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://localhost:4000/api/reviews/delete/${reviewId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ userId }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        fetchReviews();
+      } else {
+        setError(data.message || 'Error deleting review');
+      }
+    } catch (error) {
+      setError('Error deleting review');
+    }
+  };
+
+  // Start editing a review
+  const startEditReview = (review) => {
+    setEditingReview(review);
+    setUserReview({
+      rating: review.rating,
+      comment: review.comment,
+      images: review.images || [],
+    });
+    setSelectedTab('write');
+  };
+
+  // Cancel editing
+  const cancelEdit = () => {
+    setEditingReview(null);
+    setUserReview({ rating: 5, comment: '', images: [] });
   };
 
   // Like review
@@ -101,7 +171,9 @@ const ProductReviews = ({ productId, token }) => {
     try {
       const response = await fetch(`http://localhost:4000/api/reviews/like/${reviewId}`, {
         method: 'POST',
-        headers: { token },
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
       });
 
       const data = await response.json();
@@ -113,10 +185,8 @@ const ProductReviews = ({ productId, token }) => {
     }
   };
 
-  // Fetch reviews when productId or page changes
   useEffect(() => {
     if (productId) {
-      console.log('Fetching reviews for product:', productId);
       fetchReviews();
     }
   }, [productId, page]);
@@ -125,20 +195,18 @@ const ProductReviews = ({ productId, token }) => {
     <div className="mt-20">
       <div className="flex">
         <button
-          className={`px-5 py-3 text-sm ${
-            selectedTab === 'reviews' ? 'border-b-2 border-black font-bold' : 'border'
-          }`}
+          className={`px-5 py-3 text-sm ${selectedTab === 'reviews' ? 'border-b-2 border-black font-bold' : 'border'
+            }`}
           onClick={() => setSelectedTab('reviews')}
         >
           Reviews ({reviews.length})
         </button>
         <button
-          className={`px-5 py-3 text-sm ${
-            selectedTab === 'write' ? 'border-b-2 border-black font-bold' : 'border'
-          }`}
+          className={`px-5 py-3 text-sm ${selectedTab === 'write' ? 'border-b-2 border-black font-bold' : 'border'
+            }`}
           onClick={() => setSelectedTab('write')}
         >
-          Write a Review
+          {editingReview ? 'Edit Review' : 'Write a Review'}
         </button>
       </div>
 
@@ -153,7 +221,20 @@ const ProductReviews = ({ productId, token }) => {
         )}
 
         {selectedTab === 'write' ? (
-          <form onSubmit={handleSubmitReview} className="flex flex-col gap-4">
+          <form onSubmit={editingReview ? handleEditReview : handleSubmitReview} className="flex flex-col gap-4">
+            {editingReview && (
+              <div className="flex justify-between items-center">
+                <h3 className="font-medium">Editing Review</h3>
+                <button
+                  type="button"
+                  onClick={cancelEdit}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  Cancel Edit
+                </button>
+              </div>
+            )}
+
             <div>
               <label className="block text-sm font-medium mb-2">Rating</label>
               <div className="flex items-center gap-1">
@@ -186,7 +267,7 @@ const ProductReviews = ({ productId, token }) => {
               disabled={isSubmitting}
               className="bg-black text-white px-8 py-3 text-sm active:bg-gray-700 disabled:bg-gray-400"
             >
-              {isSubmitting ? 'Submitting...' : 'Submit Review'}
+              {isSubmitting ? 'Submitting...' : editingReview ? 'Update Review' : 'Submit Review'}
             </button>
           </form>
         ) : (
@@ -195,7 +276,7 @@ const ProductReviews = ({ productId, token }) => {
               reviews.map((review) => (
                 <div key={review._id} className="border-b pb-4">
                   <div className="flex justify-between items-start">
-                    <div>
+                    <div className="flex-1">
                       <div className="flex items-center gap-2">
                         {review.userId.profileImage && (
                           <img
@@ -227,12 +308,33 @@ const ProductReviews = ({ productId, token }) => {
                         </div>
                       )}
                     </div>
-                    <button
-                      onClick={() => handleLikeReview(review._id)}
-                      className="text-gray-500 hover:text-red-500"
-                    >
-                      ❤️ {review.likes?.length || 0}
-                    </button>
+                    <div className="flex flex-col items-end gap-2">
+                      <button
+                        onClick={() => handleLikeReview(review._id)}
+                        className="text-gray-500 hover:text-red-500"
+                      >
+                        ❤️ {review.likes?.length || 0}
+                      </button>
+
+                      {review.userId.$oid === userId && (
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => startEditReview(review)}
+                            className="text-blue-500 hover:text-blue-700"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => handleDeleteReview(review._id)}
+                            className="text-red-500 hover:text-red-700"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      )}
+
+
+                    </div>
                   </div>
                 </div>
               ))
@@ -246,9 +348,8 @@ const ProductReviews = ({ productId, token }) => {
                   <button
                     key={idx}
                     onClick={() => setPage(idx + 1)}
-                    className={`px-3 py-1 border rounded ${
-                      page === idx + 1 ? 'bg-black text-white' : ''
-                    }`}
+                    className={`px-3 py-1 border rounded ${page === idx + 1 ? 'bg-black text-white' : ''
+                      }`}
                   >
                     {idx + 1}
                   </button>
