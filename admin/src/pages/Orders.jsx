@@ -21,11 +21,11 @@ const Orders = ({ token }) => {
       if (response.data.success) {
         setOrders(response.data.orders);
       } else {
-        console.eroor(response.data.message);
+        console.error(response.data.message);
         toast.error(response.data.message);
       }
     } catch (error) {
-      console.eroor(error);
+      console.error(error);
       toast.error(error.message);
     }
   };

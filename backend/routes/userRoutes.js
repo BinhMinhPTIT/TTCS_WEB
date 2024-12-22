@@ -6,6 +6,7 @@ import {
   changePassword,
   getProfileInfo,
   updateProfile,
+  getAllUsers
 } from "../controllers/userController.js";
 import authUser from "../middleware/auth.js";
 
@@ -20,5 +21,8 @@ userRouter.post("/forgot", changePassword); // Password change
 // Protected Routes
 userRouter.get("/profile", authUser, getProfileInfo); // Get user profile
 userRouter.put("/profile", authUser, updateProfile); // Update user profile
+
+userRouter.get("/all", getAllUsers);
+
 
 export default userRouter;

@@ -224,5 +224,37 @@ const updateProfile = async (req, res) => {
   }
 };
 
+const getAllUsers = async (req, res) => {
+  try {
+    const users = await userModel.find().select("-password"); // Exclude password from the response
 
-export { loginUser, registerUser, adminLogin, changePassword, getProfileInfo, updateProfile };
+    if (!users || users.length === 0) {
+      return res.json({
+        success: false,
+        message: "No users found",
+      });
+    }
+
+    res.json({
+      success: true,
+      users: users.map(user => ({
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        address: user.address,
+        profileImage: user.profileImage,
+        dateOfBirth: user.dateOfBirth,
+      })),
+    });
+  } catch (error) {
+    console.error(error);
+    res.json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+
+export { loginUser, registerUser, adminLogin, changePassword, getProfileInfo, updateProfile, getAllUsers  };

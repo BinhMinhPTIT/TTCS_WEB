@@ -1,6 +1,6 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-import { FaPlusCircle, FaEdit, FaList, FaShoppingCart, FaBookOpen } from "react-icons/fa";
+import { FaPlusCircle, FaEdit, FaList, FaShoppingCart, FaBookOpen, FaUser  } from "react-icons/fa";
 
 const Sidebar = () => {
   return (
@@ -40,6 +40,13 @@ const Sidebar = () => {
         >
           <FaBookOpen className="w-5 h-5" />
           <p className="hidden md:block">Blog Management</p>
+        </NavLink>
+        <NavLink
+          to={"/users"}
+          className="flex items-center gap-3 border border-gray-300 border-r-0 px-3 py-2 rounded-l"
+        >
+          <FaUser  className="w-5 h-5" />
+          <p className="hidden md:block">Users</p>
         </NavLink>
       </div>
     </div>
