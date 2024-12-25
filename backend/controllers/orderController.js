@@ -112,7 +112,7 @@ const verifyStripe = async (req, res) => {
 // All Orders Data for Admin Panel
 const allOrders = async (req, res) => {
   try {
-    const orders = await orderModel.find({});
+    const orders = await orderModel.find({}).sort({ date: -1 });
     res.json({ success: true, orders });
   } catch (error) {
     console.log(error);
@@ -124,7 +124,7 @@ const allOrders = async (req, res) => {
 const usersOrders = async (req, res) => {
   try {
     const { userId } = req.body;
-    const orders = await orderModel.find({ userId });
+    const orders = await orderModel.find({ userId }).sort({ date: -1 });
     res.json({ success: true, orders });
   } catch (error) {
     console.log(error);
@@ -137,12 +137,88 @@ const updateStatus = async (req, res) => {
   try {
     const { orderId, status } = req.body;
     await orderModel.findByIdAndUpdate(orderId, { status });
+
+    if (status === 'Delivered') {
+      await orderModel.findByIdAndUpdate(orderId, { payment: true });
+    }
+
     res.json({ success: true, message: "Order Status updated successfully" });
   } catch (error) {
     console.log(error);
     res.json({ success: false, message: error.message });
   }
 };
+
+const getRevenueByMonth = async (req, res) => {
+  try {
+    const { year } = req.query;
+    const selectedYear = parseInt(year) || new Date().getFullYear();
+
+    const startDate = new Date(selectedYear, 0, 1).getTime();
+    const endDate = new Date(selectedYear, 11, 31, 23, 59, 59, 999).getTime();
+
+    const revenue = await orderModel.aggregate([
+      {
+        $match: {
+          payment: true,
+          date: {
+            $gte: startDate,
+            $lte: endDate
+          }
+        }
+      },
+      {
+        $project: {
+          month: {
+            $month: {
+              $toDate: "$date"
+            }
+          },
+          amount: 1
+        }
+      },
+      {
+        $group: {
+          _id: "$month",
+          totalRevenue: { $sum: "$amount" }
+        }
+      },
+      {
+        $sort: { _id: 1 }
+      }
+    ]);
+
+    const formattedRevenue = Array.from({ length: 12 }, (_, index) => ({
+      month: index + 1,
+      totalRevenue: revenue.find(r => r._id === index + 1)?.totalRevenue || 0
+    }));
+
+    res.status(200).json({
+      success: true,
+      data: formattedRevenue
+    });
+  } catch (error) {
+    console.error("Revenue aggregation error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error fetching revenue data",
+      error: error.message
+    });
+  }
+};
+
+const getOrderByUser = async (req, res) => {
+  try {
+    const userId = req.body.userId;
+    const orders = await orderModel.find({ userId });
+
+    res.json({ success: true, orders });
+
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  }
+}
 
 export {
   placeOrder,
@@ -151,4 +227,6 @@ export {
   usersOrders,
   updateStatus,
   verifyStripe,
+  getRevenueByMonth,
+  getOrderByUser
 };

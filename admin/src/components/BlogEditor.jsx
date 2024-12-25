@@ -31,7 +31,7 @@ const BlogEditor = ({ onSave, blog }) => {
   return (
     <div className="p-4 border rounded mb-4 bg-white">
       <div>
-        <label className="block mb-2 font-semibold">Tiêu đề bài viết:</label>
+        <label className="block mb-2 font-semibold">Title</label>
         <input
           type="text"
           value={title}
@@ -41,7 +41,7 @@ const BlogEditor = ({ onSave, blog }) => {
         />
       </div>
       <div>
-        <label className="block mb-2 font-semibold">Ảnh đại diện:</label>
+        <label className="block mb-2 font-semibold">Thumbnail</label>
         <input
           type="text"
           value={thumbnail}
@@ -51,7 +51,7 @@ const BlogEditor = ({ onSave, blog }) => {
         />
       </div>
       <div>
-        <label className="block mb-2 font-semibold">Nội dung:</label>
+        <label className="block mb-2 font-semibold">Content:</label>
         <Editor
           apiKey="lvivh3c8qfloh6xetl80ia75j1hvrojjz6hetavcdqupft3r"
           value={content}
@@ -68,7 +68,7 @@ const BlogEditor = ({ onSave, blog }) => {
         onClick={handleSave}
         className="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
       >
-        Lưu bài viết
+        Save blog
       </button>
     </div>
   );

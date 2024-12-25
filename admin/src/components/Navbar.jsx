@@ -1,11 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import { assets } from "../assets/assets.js";
 const Navbar = ({ setToken }) => {
-  const navigate = useNavigate(); // Initialize the navigation hook
+  const navigate = useNavigate();
 
   const handleClick = () => {
     setToken("");
-    navigate("/"); // Redirect to the root path after logout
+    navigate("/");
   };
   return (
     <div className="flex items-center justify-between py-2 px-[4%]">

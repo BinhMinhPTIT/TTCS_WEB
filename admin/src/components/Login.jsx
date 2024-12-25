@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 const Login = ({ setToken }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
+  const [showPassword, setShowPassword] = useState(false);
 
   const onSubmitHandler = async (e) => {
     try {

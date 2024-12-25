@@ -8,6 +8,7 @@ import {
   updateStatus,
   verifyStripe,
   // verifyRazorpay,
+  getRevenueByMonth
 } from "../controllers/orderController.js";
 import adminAuth from "../middleware/adminAuth.js";
 import authUser from "../middleware/auth.js";
@@ -29,5 +30,9 @@ orderRouter.post("/userorders", authUser, usersOrders);
 // Verify Payment
 orderRouter.post("/verifyStripe", authUser, verifyStripe);
 // orderRouter.post("/verifyRazorpay", authUser, verifyRazorpay);
+
+orderRouter.get("/revenue-by-month", getRevenueByMonth);
+
+orderRouter.get("/order-detail", adminAuth, getOrderByUser);
 
 export default orderRouter;

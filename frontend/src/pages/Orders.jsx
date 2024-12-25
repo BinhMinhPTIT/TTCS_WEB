@@ -8,6 +8,8 @@ import axios from "axios";
 const Orders = () => {
   const { currency, backendUrl, token } = useContext(ShopContext);
   const [orderData, setOrderData] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(5); // Số item trên mỗi trang
 
   const loadOrderData = async () => {
     try {
@@ -45,13 +47,55 @@ const Orders = () => {
     loadOrderData();
   }, [token]);
 
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = orderData.slice(indexOfFirstItem, indexOfLastItem);
+
+  const totalPages = Math.ceil(orderData.length / itemsPerPage);
+
+  const Pagination = () => {
+    return (
+      <div className="flex justify-center items-center gap-2 mt-6 mb-8">
+        <button
+          onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+          disabled={currentPage === 1}
+          className="px-4 py-2 rounded-sm border text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Previous
+        </button>
+
+        {[...Array(totalPages)].map((_, index) => (
+          <button
+            key={index + 1}
+            onClick={() => setCurrentPage(index + 1)}
+            className={`px-4 py-2 rounded-sm text-sm font-medium ${
+              currentPage === index + 1 
+                ? 'bg-gray-900 text-white' 
+                : 'border hover:bg-gray-50'
+            }`}
+          >
+            {index + 1}
+          </button>
+        ))}
+
+        <button
+          onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+          disabled={currentPage === totalPages}
+          className="px-4 py-2 rounded-sm border text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Next
+        </button>
+      </div>
+    );
+  };
+
   return (
     <div className="border-t pt-16">
       <div className="text-2xl">
         <Title text1={"MY"} text2={"ORDERS"} />
       </div>
       <div>
-        {orderData.map((item, index) => (
+        {currentItems.map((item, index) => (
           <div
             key={index}
             className="py-4 border-t border-b text-gray-700 flex flex-col md:flex-row md:items-center md:justify-between gap-4"
@@ -94,7 +138,6 @@ const Orders = () => {
                       : "bg-green-500"
                   }`}
                 ></p>
-
                 <p className="text-sm md:text-base">{item.status}</p>
               </div>
               <button
@@ -106,6 +149,7 @@ const Orders = () => {
             </div>
           </div>
         ))}
+        {orderData.length > 0 && <Pagination />}
       </div>
     </div>
   );

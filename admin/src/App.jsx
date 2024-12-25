@@ -10,6 +10,7 @@ import Login from "./components/Login";
 import { ToastContainer } from "react-toastify";
 import BlogManagement from "./pages/BlogManagement"; // Import trang BlogManagement
 import UsersList from "./pages/UsersList"; // Import the UsersList page
+import ChartPage from "./pages/ChartPage"; // Import the UsersList page
 import "react-toastify/dist/ReactToastify.css";
 
 export const backEndURL = "http://localhost:4000";
@@ -43,6 +44,7 @@ const App = () => {
                 <Route path="/orders" element={<Orders token={token} />} />
                 <Route path="/blog-management" element={<BlogManagement token={token} />} />
                 <Route path="/users" element={<UsersList />} />
+                <Route path="/chart" element={<ChartPage />} />
               </Routes>
             </div>
           </div>

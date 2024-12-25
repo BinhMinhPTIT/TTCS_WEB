@@ -144,7 +144,7 @@ const changePassword = async (req, res) => {
 
 const getProfileInfo = async (req, res) => {
   try {
-    const userId = req.body.userId; // Get userId from req.body as set by authUser middleware
+    const userId = req.body.userId;
 
     if (!userId) {
       return res.json({
@@ -153,7 +153,7 @@ const getProfileInfo = async (req, res) => {
       });
     }
 
-    const user = await userModel.findById(userId).select("-password"); // Exclude password from the response
+    const user = await userModel.findById(userId).select("-password");
 
     if (!user) {
       return res.json({
@@ -226,7 +226,7 @@ const updateProfile = async (req, res) => {
 
 const getAllUsers = async (req, res) => {
   try {
-    const users = await userModel.find().select("-password"); // Exclude password from the response
+    const users = await userModel.find().select("-password");
 
     if (!users || users.length === 0) {
       return res.json({
