@@ -10,8 +10,6 @@
 
 *Nền tảng thương mại điện tử thời trang hiện đại, an toàn và dễ sử dụng*
 
-[Demo](https://canifa-store.vercel.app) | [Tài liệu API](./api-docs.md) | [Báo cáo Lỗi](https://github.com/your-username/canifa-store/issues)
-
 </div>
 
 ## 📋 Mục lục
