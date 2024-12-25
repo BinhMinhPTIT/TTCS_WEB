@@ -10,9 +10,9 @@ const productSchema = new mongoose.Schema({
   sizes: { type: Array, required: true },
   bestseller: { type: Boolean },
   date: { type: Number, required: true },
-  reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: "review" }], // Added reviews reference
-  averageRating: { type: Number, default: 0 }, // Added average rating field
-  totalReviews: { type: Number, default: 0 } // Added total reviews count
+  reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: "review" }],
+  averageRating: { type: Number, default: 0 },
+  totalReviews: { type: Number, default: 0 }
 });
 
 const productModel =

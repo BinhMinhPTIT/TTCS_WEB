@@ -8,9 +8,9 @@ const BlogEditor = ({ onSave, blog }) => {
 
   useEffect(() => {
     if (blog) {
-      setTitle(blog.title || ""); // Đảm bảo không null
-      setContent(blog.content || ""); // Đảm bảo không null
-      setThumbnail(blog.thumbnail || ""); // Đảm bảo không null
+      setTitle(blog.title || "");
+      setContent(blog.content || "");
+      setThumbnail(blog.thumbnail || "");
     } else {
       setTitle("");
       setContent("");
@@ -20,7 +20,7 @@ const BlogEditor = ({ onSave, blog }) => {
 
 
   const handleSave = () => {
-    console.log({ title, content, thumbnail }); // Kiểm tra dữ liệu gửi đi
+    console.log({ title, content, thumbnail });
     onSave({ title, content, thumbnail });
     setTitle("");
     setContent("");

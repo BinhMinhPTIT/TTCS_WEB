@@ -205,7 +205,7 @@ export const deleteReview = async (req, res) => {
 export const likeReview = async (req, res) => {
   try {
     const { reviewId } = req.params;
-    const userId = req.user.id; // From auth middleware
+    const userId = req.user.id;
 
     const review = await Review.findById(reviewId);
     if (!review) {

@@ -33,6 +33,6 @@ orderRouter.post("/verifyStripe", authUser, verifyStripe);
 
 orderRouter.get("/revenue-by-month", getRevenueByMonth);
 
-orderRouter.get("/order-detail", adminAuth, getOrderByUser);
+// orderRouter.get("/order-detail", adminAuth, getOrderByUser);
 
 export default orderRouter;
